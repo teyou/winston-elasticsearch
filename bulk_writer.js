@@ -174,16 +174,22 @@ BulkWriter.prototype.checkEsConnection = function checkEsConnection() {
       thiz.client.ping().then(
         (res) => {
           thiz.esConnection = true;
+          const start = () => {
+            if (thiz.options.buffering === true) {
+              debug('starting bulk writer');
+              thiz.running = true;
+              thiz.tick();
+            }
+          };
           // Ensure mapping template is existing if desired
           if (thiz.options.ensureMappingTemplate) {
-            thiz.ensureMappingTemplate(fulfill, reject);
+            thiz.ensureMappingTemplate((res1) => {
+              fulfill(res1);
+              start();
+            },reject);
           } else {
             fulfill(true);
-          }
-          if (thiz.options.buffering === true) {
-            debug('starting bulk writer');
-            thiz.running = true;
-            thiz.tick();
+            start();
           }
         },
         (err) => {
