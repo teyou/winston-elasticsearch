@@ -171,11 +171,7 @@ BulkWriter.prototype.checkEsConnection = function checkEsConnection() {
   return new Promise((fulfill, reject) => {
     operation.attempt((currentAttempt) => {
       debug('checking for connection');
-      thiz.client.cluster.health({
-        timeout: '5s',
-        wait_for_nodes: '1',
-        wait_for_status: 'yellow'})
-        .then(
+      thiz.client.ping().then(
         (res) => {
           thiz.esConnection = true;
           // Ensure mapping template is existing if desired
